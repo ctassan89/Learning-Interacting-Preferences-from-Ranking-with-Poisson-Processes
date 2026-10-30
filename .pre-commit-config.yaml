@@ -1,0 +1,9 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+        additional_dependencies:
+          - black[jupyter]==24.2.0
+        types_or: [python, pyi, jupyter]
+

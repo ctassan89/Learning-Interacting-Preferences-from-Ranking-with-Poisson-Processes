@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -12,9 +11,9 @@ class encoder(nn.Module):
         self.network = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim//2),
+            nn.Linear(hidden_dim, hidden_dim // 2),
             nn.ReLU(),
-            nn.Linear(hidden_dim//2, latent_dim)
+            nn.Linear(hidden_dim // 2, latent_dim),
         )
 
     def forward(self, x):
@@ -25,11 +24,11 @@ class decoder(nn.Module):
     def __init__(self, latent_dim, hidden_dim, output_dim):
         super().__init__()
         self.network = nn.Sequential(
-            nn.Linear(latent_dim, hidden_dim//2),
+            nn.Linear(latent_dim, hidden_dim // 2),
             nn.ReLU(),
-            nn.Linear(hidden_dim//2, hidden_dim),
+            nn.Linear(hidden_dim // 2, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, output_dim)
+            nn.Linear(hidden_dim, output_dim),
         )
 
     def forward(self, z):
@@ -86,10 +85,11 @@ def train(model, train_dataloader, val_dataloader, epochs=100, lr=0.001):
         val_avg_loss = val_loss / len(val_dataloader.dataset)
         val_losses.append(val_avg_loss)
 
-        print(f"Epoch {epoch+1}/{epochs}, Train Loss: {avg_loss:.6f}, Val Loss: {val_avg_loss:.6f}")
+        print(
+            f"Epoch {epoch+1}/{epochs}, Train Loss: {avg_loss:.6f}, Val Loss: {val_avg_loss:.6f}"
+        )
 
     return train_losses, val_losses
-
 
 
 if __name__ == "__main__":
@@ -101,34 +101,17 @@ if __name__ == "__main__":
     X = Z @ A.T + eps  # Shape: (1000, 500)
     train_dataset, val_dataset = random_split(X, [800, 200])
 
+    train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=32,
-        shuffle=True
-    )
-
-    val_dataloader = DataLoader(
-        val_dataset,
-        batch_size=32,
-        shuffle=False
-    )
+    val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
     # Initialize autoencoder
-    model = autoencoder(
-        input_dim=500,
-        hidden_dim=128,
-        latent_dim=32
-    )
+    model = autoencoder(input_dim=500, hidden_dim=128, latent_dim=32)
 
     # Train autoencoder
     train_losses, val_losses = train(
-    model,
-    train_dataloader,
-    val_dataloader,
-    epochs=100,
-    lr=0.001
-)
+        model, train_dataloader, val_dataloader, epochs=100, lr=0.001
+    )
 
     # Verify output dimensions
     model.eval()
@@ -140,20 +123,11 @@ if __name__ == "__main__":
     print("Embedding shape:", z.shape)
     print("Reconstructed shape:", x_hat.shape)
 
-
     plt.figure(figsize=(8, 5))
 
-    plt.plot(
-    range(1, len(train_losses) + 1),
-    train_losses,
-    label="Training Loss"
-    )
+    plt.plot(range(1, len(train_losses) + 1), train_losses, label="Training Loss")
 
-    plt.plot(
-    range(1, len(val_losses) + 1),
-    val_losses,
-    label="Validation Loss"
-    )
+    plt.plot(range(1, len(val_losses) + 1), val_losses, label="Validation Loss")
 
     plt.xlabel("Epoch")
     plt.ylabel("MSE Loss")

@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 from models.AE import decoder
@@ -14,7 +13,7 @@ class VAEencoder(nn.Module):
             nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU()
+            nn.ReLU(),
         )
 
         # Two outputs: mean and log-variance
@@ -37,7 +36,6 @@ class VAE(nn.Module):
         self.encoder = VAEencoder(input_dim, hidden_dim, latent_dim)
         self.decoder = decoder(latent_dim, hidden_dim, input_dim)
         self.criterion = nn.MSELoss(reduction="sum")
-
 
     def reparameterize(self, mean, logvar):
         # Convert log-variance to standard deviation
@@ -68,7 +66,6 @@ class VAE(nn.Module):
         kl_loss = -0.5 * torch.sum(1 + logvar - mean**2 - torch.exp(logvar))
         total_loss = (reconstruction_loss + kl_loss) / x.size(0)
         return total_loss
-
 
 
 def train(model, train_dataloader, val_dataloader, epochs=100, lr=0.001):
@@ -116,8 +113,6 @@ def train(model, train_dataloader, val_dataloader, epochs=100, lr=0.001):
     return train_losses, val_losses
 
 
-
-
 if __name__ == "__main__":
 
     # Synthetic dataset: 1000 observations, 500 features
@@ -132,32 +127,16 @@ if __name__ == "__main__":
     # Train/validation split: 80/20
     train_dataset, val_dataset = random_split(X, [800, 200])
 
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=32,
-        shuffle=True
-    )
+    train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-    val_dataloader = DataLoader(
-        val_dataset,
-        batch_size=32,
-        shuffle=False
-    )
+    val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
     # Initialize VAE
-    model = VAE(
-        input_dim=500,
-        hidden_dim=128,
-        latent_dim=32
-    )
+    model = VAE(input_dim=500, hidden_dim=128, latent_dim=32)
 
     # Train VAE
     train_losses, val_losses = train(
-        model,
-        train_dataloader,
-        val_dataloader,
-        epochs=100,
-        lr=0.001
+        model, train_dataloader, val_dataloader, epochs=100, lr=0.001
     )
 
     # Verify output dimensions
@@ -173,17 +152,9 @@ if __name__ == "__main__":
     # Plot training and validation loss
     plt.figure(figsize=(8, 5))
 
-    plt.plot(
-        range(1, len(train_losses) + 1),
-        train_losses,
-        label="Training Loss"
-    )
+    plt.plot(range(1, len(train_losses) + 1), train_losses, label="Training Loss")
 
-    plt.plot(
-        range(1, len(val_losses) + 1),
-        val_losses,
-        label="Validation Loss"
-    )
+    plt.plot(range(1, len(val_losses) + 1), val_losses, label="Validation Loss")
 
     plt.xlabel("Epoch")
     plt.ylabel("VAE Loss (Reconstruction + KL)")
