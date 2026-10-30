@@ -12,9 +12,9 @@ class encoder(nn.Module):
         self.network = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, 64),
+            nn.Linear(hidden_dim, hidden_dim//2),
             nn.ReLU(),
-            nn.Linear(64, latent_dim)
+            nn.Linear(hidden_dim//2, latent_dim)
         )
 
     def forward(self, x):
@@ -25,9 +25,9 @@ class decoder(nn.Module):
     def __init__(self, latent_dim, hidden_dim, output_dim):
         super().__init__()
         self.network = nn.Sequential(
-            nn.Linear(latent_dim, 64),
+            nn.Linear(latent_dim, hidden_dim//2),
             nn.ReLU(),
-            nn.Linear(64, hidden_dim),
+            nn.Linear(hidden_dim//2, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, output_dim)
         )
@@ -89,6 +89,7 @@ def train(model, train_dataloader, val_dataloader, epochs=100, lr=0.001):
         print(f"Epoch {epoch+1}/{epochs}, Train Loss: {avg_loss:.6f}, Val Loss: {val_avg_loss:.6f}")
 
     return train_losses, val_losses
+
 
 
 if __name__ == "__main__":
