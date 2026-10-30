@@ -1,0 +1,87 @@
+{
+  "slices": {
+    "text": [
+      0,
+      100
+    ],
+    "genres": [
+      100,
+      120
+    ],
+    "language": [
+      120,
+      131
+    ],
+    "keywords": [
+      131,
+      181
+    ],
+    "cast": [
+      181,
+      231
+    ],
+    "directors": [
+      231,
+      261
+    ],
+    "writers": [
+      261,
+      291
+    ],
+    "companies": [
+      291,
+      321
+    ],
+    "collection": [
+      321,
+      729
+    ],
+    "numeric": [
+      729,
+      733
+    ]
+  },
+  "weights": {
+    "text": 1.0,
+    "genres": 1.0,
+    "language": 0.5,
+    "keywords": 1.0,
+    "cast": 1.0,
+    "directors": 1.0,
+    "writers": 1.0,
+    "companies": 1.0,
+    "collection": 1.0,
+    "numeric": 1.0
+  },
+  "settings": {
+    "keywords": [
+      5,
+      50
+    ],
+    "cast": [
+      5,
+      50
+    ],
+    "directors": [
+      3,
+      30
+    ],
+    "writers": [
+      3,
+      30
+    ],
+    "companies": [
+      5,
+      30
+    ],
+    "collection": [
+      2,
+      null
+    ],
+    "text": [
+      5,
+      100
+    ]
+  },
+  "seed": 2026
+}

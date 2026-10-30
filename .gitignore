@@ -3,3 +3,5 @@ data/raw/
 .idea/
 .DS_Store
 .ipynb_checkpoints/
+data/processed/features.csv
+data/processed/raw_*.npz
