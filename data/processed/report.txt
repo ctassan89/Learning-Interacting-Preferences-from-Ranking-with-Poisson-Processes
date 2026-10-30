@@ -1,0 +1,26 @@
+films in ratings_small: 9066
+  with a tmdbId in links_small: 9053
+  with metadata (kept in the catalogue): 9025
+  dropped (no metadata): 41 -> listed in dropped_films.csv
+ratings on kept films: 99810 of 100004
+train films: 8171, held-out films: 854
+feature matrix: 9025 films x 733 columns
+  text        columns    0-99   (100)
+  genres      columns  100-119  (20)
+  language    columns  120-130  (11)
+  keywords    columns  131-180  (50)
+  cast        columns  181-230  (50)
+  directors   columns  231-260  (30)
+  writers     columns  261-290  (30)
+  companies   columns  291-320  (30)
+  collection  columns  321-728  (408)
+  numeric     columns  729-732  (4)
+  films with no genres after the vocabulary filter: 35
+  films with no keywords after the vocabulary filter: 970
+  films with no cast after the vocabulary filter: 1727
+  films with no directors after the vocabulary filter: 3338
+  films with no writers after the vocabulary filter: 4233
+  films with no companies after the vocabulary filter: 2418
+  films with no collection after the vocabulary filter: 7840
+  films with no overview/tagline: 13
+  missing year / runtime / budget: 0 / 20 / 4409
