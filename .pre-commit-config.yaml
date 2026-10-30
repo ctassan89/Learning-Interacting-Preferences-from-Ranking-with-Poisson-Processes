@@ -1,9 +1,10 @@
 repos:
-  - repo: https://github.com/psf/black
+  - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 24.2.0
     hooks:
       - id: black
         additional_dependencies:
-          - black[jupyter]==24.2.0
+          - ipython>=7.8.0
+          - tokenize-rt>=3.2.0
         types_or: [python, pyi, jupyter]
 
