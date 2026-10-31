@@ -57,12 +57,13 @@ halves (budget known / unknown in TMDb).
 
 **Weights.** Each block is first rescaled to total variance 1 (so a block with many columns does not
 dominate), then multiplied by its weight; its contribution to squared distances grows with the weight
-squared. The weights were chosen with `scripts/tune_weights.py`: 108 combinations, chosen on half of the
-users with the time-matched taste test, confirmed on the other half.
+squared. The weights were chosen with a grid search: 108 combinations, chosen on half of the users with
+the time-matched taste test, confirmed on the other half.
 
 ## How we checked it
-Full results in `results/feature_choice/` (scripts `ablation_features.py`, `tune_weights.py`). Taste AUC on
-the full matrix (0.5 = no signal), version 1 -> version 2:
+With an ablation study (each block alone, the matrix without each block, both encodings) and the weight
+search; the analysis scripts will be added with the report. Taste AUC on the full matrix (0.5 = no
+signal), version 1 -> version 2:
 
 | taste test | v1 | v2 |
 |---|---|---|

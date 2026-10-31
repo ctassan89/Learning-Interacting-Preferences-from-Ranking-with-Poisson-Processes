@@ -6,5 +6,4 @@ data/raw/
 __pycache__/
 data/processed/features.csv
 data/processed/raw_*.npz
-results/*
-!results/feature_choice/
+results/

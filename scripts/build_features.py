@@ -25,9 +25,9 @@ Version 2 (31 October 2026), changes from version 1 (30 October, still in the gi
   - every list block (keywords, cast, directors, writers, companies, sagas) is encoded with random codes
     (see ENCODING) instead of SVD / 0-1 columns. With SVD only the most frequent names survived (the ~30
     most prolific directors, the most frequent actors such as Tom Hanks) and their films dominated the
-    distances; the rescaled 0-1 saga columns made "islands". In ablation_features.py (31 Oct) this
+    distances; the rescaled 0-1 saga columns made "islands". In an ablation study (31 Oct) this
     encoding beat v1 on the taste test (AUC 0.574 vs 0.525), on genre agreement and on the neighbours;
-  - block weights chosen with tune_weights.py (see WEIGHTS);
+  - block weights chosen with a weight search on the users' tastes (see WEIGHTS);
   - a missing budget (half of the films) is filled by a regression on year, runtime, genres, language and
     production companies, instead of median + a 0/1 "budget missing" column: that column split the map in
     two halves (budget known / unknown in TMDb), i.e. the main structure came from a gap in the data.
@@ -70,7 +70,7 @@ SET_BLOCKS = ["keywords", "cast", "directors", "writers", "companies", "collecti
 #   "onehot"  one 0/1 column per name seen in >= min training films, no compression.
 # For "code" blocks the min count only sets the vocabulary of the raw_<block>.npz files.
 ENCODING = {b: ("code", 2, CODE_DIM) for b in SET_BLOCKS}
-ENCODING_V2A = {                    # first draft of v2 (30 Oct), kept for comparison (ablation_features.py)
+ENCODING_V2A = {                    # first draft of v2 (30 Oct), kept for comparison
     "keywords":   ("svd", 5, 50),
     "cast":       ("svd", 5, 50),
     "directors":  ("code", 2, CODE_DIM),
@@ -78,7 +78,7 @@ ENCODING_V2A = {                    # first draft of v2 (30 Oct), kept for compa
     "companies":  ("svd", 5, 30),
     "collection": ("code", 2, CODE_DIM),
 }
-ENCODING_V1 = {                     # version 1 of the matrix, kept for comparison (ablation_features.py)
+ENCODING_V1 = {                     # version 1 of the matrix, kept for comparison
     "keywords":   ("svd", 5, 50),
     "cast":       ("svd", 5, 50),
     "directors":  ("svd", 3, 30),
@@ -92,7 +92,7 @@ BUDGET = "regression"               # missing budget: "regression" (predicted fr
 NOT_WRITERS = {"Storyboard"}        # jobs of the Writing department that we do not count as writers
 TOP_ACTORS = 5
 TOP_LANGUAGES = 10
-# Block weights, chosen with tune_weights.py (31 Oct): grid of 108 combinations, choice on half of the users
+# Block weights, chosen with a weight search (31 Oct): grid of 108 combinations, choice on half of the users
 # with the time-matched taste test, check on the other half, where they beat the old weights in all three
 # taste tests (random +0.009, time +0.007, top-vs-disliked +0.017). Genres and runtime / budget are the most
 # robust taste signals; text and language add nothing (language even hurts top-vs-disliked).
