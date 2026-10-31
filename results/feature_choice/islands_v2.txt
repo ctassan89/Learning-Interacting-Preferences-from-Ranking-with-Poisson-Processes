@@ -1,0 +1,56 @@
+raw_features_v2: 6 groups of >= 15 films separated by empty space (radius 1.5% of the map); 19 scattered films belong to none.
+Shares: most common value in the group (and in the whole catalogue).
+
+MAIN CONTINENT: 8402 films (93.1%)
+  language  en 88% (catalogue 88%)
+  genre     Drama 28% (catalogue 26%)
+  saga      none dominant (most common: James Bond Collection 0.3%)   (films in any saga: 19%)
+  director  none dominant (most common: Woody Allen 0.5%)
+  budget known 54% (catalogue 51%)
+  median year 1997
+  e.g. Forrest Gump (1994); Pulp Fiction (1994); The Shawshank Redemption (1994); The Silence of the Lambs (1991); Star Wars (1977)
+
+island 1: 431 films (4.8%)
+  language  en 93% (catalogue 88%)
+  genre     Documentary 85% (catalogue 4%)
+  saga      none dominant (most common: The Up Series 1.9%)   (films in any saga: 11%)
+  director  none dominant (most common: Werner Herzog 2.3%)
+  budget known 10% (catalogue 51%)
+  median year 2004
+  e.g. Hoop Dreams (1994); Bowling for Columbine (2002); Roger & Me (1989); Crumb (1994); The Thin Blue Line (1988)
+
+island 2: 82 films (0.9%)
+  language  en 87% (catalogue 88%)
+  genre     Animation 45% (catalogue 3%)
+  saga      none dominant (most common: Wallace & Gromit Collection 4.9%)   (films in any saga: 13%)
+  director  Buster Keaton 7%
+  budget known 13% (catalogue 51%)
+  median year 1994
+  e.g. The Wrong Trousers (1993); A Close Shave (1995); A Grand Day Out (1990); Winnie the Pooh and the Blustery Day (1968); How the Grinch Stole Christmas! (1966)
+
+island 3: 38 films (0.4%)
+  language  en 89% (catalogue 88%)
+  genre     Drama 42% (catalogue 26%)
+  saga      none dominant (most common: The Prophecy Collection 2.6%)   (films in any saga: 13%)
+  director  none dominant (most common: Anthony Waller 2.6%)
+  budget known 100% (catalogue 51%)
+  median year 1994
+  e.g. Modern Times (1936); The Karate Kid, Part II (1986); Immortal Beloved (1994); The Prophecy (1995); East of Eden (1955)
+
+island 4: 35 films (0.4%)
+  language  en 51% (catalogue 88%)
+  genre     Drama 91% (catalogue 26%)
+  saga      none dominant (most common: Elements Trilogy 2.9%)   (films in any saga: 3%)
+  director  none dominant (most common: Gianni Amelio 2.9%)
+  budget known 9% (catalogue 51%)
+  median year 1998
+  e.g. The Dreamlife of Angels (1998); The Pillow Book (1996); Love and Death on Long Island (1997); Three Seasons (1999); Xiu Xiu: The Sent-Down Girl (1998)
+
+island 5: 18 films (0.2%)
+  language  ja 94% (catalogue 2%)
+  genre     Action 61% (catalogue 13%)
+  saga      Dragon Ball Z (Movie) Collection 61%   (films in any saga: 83%)
+  director  Daisuke Nishio 28%
+  budget known 6% (catalogue 51%)
+  median year 1992
+  e.g. Dr. Horrible's Sing-Along Blog (2008); Dragon Ball Z: Battle of Gods (2013); Burn Up! (1991); Dragon Ball GT: A Hero's Legacy (1997); Dragon Ball Z: The History of Trunks (1993)
