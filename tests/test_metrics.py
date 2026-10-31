@@ -6,10 +6,16 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 
-from experiments.train_ae_A import (
+from experiments.common import (
+    DATASET_VERSION,
+    FEATURE_CONFIGURATIONS,
     FEATURE_GROUPS,
+    _vae_batch_losses,
     extract_embeddings,
+    extract_vae_embeddings,
     fit_experiment_builder,
+    load_cleaned_movies,
+    prepare_experiment_data,
     restore_best_state,
     select_experiment_a_features,
     split_movie_indices,
@@ -218,6 +224,96 @@ class MetricsTests(unittest.TestCase):
         embeddings = extract_embeddings(model, features, torch.device("cpu"))
         self.assertEqual(embeddings.shape, (len(movie_ids), 3))
         self.assertEqual(len(movie_ids), len(embeddings))
+
+    def test_v2_cleaned_loader_restores_feature_builder_inputs(self):
+        movies = load_cleaned_movies()
+        self.assertEqual(DATASET_VERSION, "v2")
+        self.assertEqual(len(movies), 9025)
+        self.assertEqual(movies["movieId"].tolist()[:3], [1, 2, 3])
+        self.assertTrue(all(isinstance(value, list) for value in movies["keywords"]))
+        self.assertTrue(all(isinstance(value, list) for value in movies["companies"]))
+        self.assertIn("text", movies.columns)
+        self.assertEqual(
+            movies["split"].value_counts().to_dict(), {"train": 8171, "heldout": 854}
+        )
+
+    def test_v2_random_code_keywords_are_deterministic(self):
+        from scripts.build_features import CODE_DIM, code_block, name_code
+
+        first = name_code("keywords", "space adventure", CODE_DIM)
+        second = name_code("keywords", "space adventure", CODE_DIM)
+        np.testing.assert_array_equal(first, second)
+        codes = code_block(
+            [["space adventure"], ["space adventure"], []],
+            [1, 2, 3],
+            "keywords",
+            CODE_DIM,
+        )
+        self.assertEqual(codes.shape, (3, 128))
+        np.testing.assert_array_equal(codes[0], codes[1])
+        self.assertAlmostEqual(np.linalg.norm(codes[2]), 1.0)
+
+    def test_v2_preprocessing_smoke_test_uses_only_experiment_training_movies(self):
+        prepared = prepare_experiment_data()
+        self.assertEqual(prepared.input_dim, 248)
+        self.assertEqual(
+            prepared.block_dimensions,
+            {"genres": 20, "keywords": 128, "text": 100},
+        )
+        self.assertEqual(
+            prepared.block_weights,
+            {"genres": 1.5, "keywords": 1.0, "text": 0.5},
+        )
+        self.assertEqual(prepared.features["train"].shape, (6945, 248))
+        self.assertEqual(prepared.features["val"].shape, (1226, 248))
+        self.assertEqual(prepared.features["heldout"].shape, (854, 248))
+        self.assertTrue(np.isfinite(prepared.features["train"]).all())
+
+    def test_all_experiment_configurations_select_expected_v2_dimensions(self):
+        widths = {
+            "text": 100,
+            "genres": 20,
+            "language": 11,
+            "keywords": 128,
+            "cast": 128,
+            "directors": 128,
+            "writers": 128,
+            "companies": 128,
+            "collection": 128,
+            "numeric": 3,
+        }
+        expected = {"A": 248, "B": 632, "C": 771, "D": 902}
+        start = 0
+        slices = {}
+        for name, width in widths.items():
+            slices[name] = (start, start + width)
+            start += width
+        matrix = np.zeros((3, start), dtype=np.float32)
+        from experiments.common import select_feature_groups
+
+        for name, groups in FEATURE_CONFIGURATIONS.items():
+            selected = select_feature_groups(matrix, slices, groups)
+            self.assertEqual(selected.shape, (3, expected[name]))
+
+    def test_vae_forward_mean_embeddings_and_loss_accounting(self):
+        import torch
+
+        from models.VAE import VAE
+
+        model = VAE(input_dim=7, hidden_dim=8, latent_dim=3)
+        batch = torch.arange(35, dtype=torch.float32).reshape(5, 7)
+        reconstruction, mean, logvar = model(batch)
+        self.assertEqual(reconstruction.shape, batch.shape)
+        self.assertEqual(mean.shape, (5, 3))
+        self.assertEqual(logvar.shape, (5, 3))
+        reconstruction_loss, kl_loss, total_loss = _vae_batch_losses(model, batch)
+        self.assertTrue(torch.allclose(total_loss, reconstruction_loss + kl_loss))
+        embeddings = extract_vae_embeddings(model, batch.numpy(), torch.device("cpu"))
+        self.assertEqual(embeddings.shape, (5, 3))
+        model.eval()
+        with torch.no_grad():
+            expected_mean, _ = model.encoder(batch)
+        np.testing.assert_allclose(embeddings, expected_mean.numpy())
 
 
 if __name__ == "__main__":
