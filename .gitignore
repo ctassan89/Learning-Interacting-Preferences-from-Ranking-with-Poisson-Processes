@@ -61,6 +61,7 @@ runs/
 wandb/
 mlruns/
 outputs/
+results/
 
 # Local experiment plots
 *_training_validation.png

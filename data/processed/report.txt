@@ -4,23 +4,24 @@ films in ratings_small: 9066
   dropped (no metadata): 41 -> listed in dropped_films.csv
 ratings on kept films: 99810 of 100004
 train films: 8171, held-out films: 854
-feature matrix: 9025 films x 733 columns
-  text        columns    0-99   (100)
+feature matrix: 9025 films x 902 columns
+  text        columns    0-99   (100)  svd
   genres      columns  100-119  (20)
   language    columns  120-130  (11)
-  keywords    columns  131-180  (50)
-  cast        columns  181-230  (50)
-  directors   columns  231-260  (30)
-  writers     columns  261-290  (30)
-  companies   columns  291-320  (30)
-  collection  columns  321-728  (408)
-  numeric     columns  729-732  (4)
-  films with no genres after the vocabulary filter: 35
-  films with no keywords after the vocabulary filter: 970
-  films with no cast after the vocabulary filter: 1727
-  films with no directors after the vocabulary filter: 3338
-  films with no writers after the vocabulary filter: 4233
-  films with no companies after the vocabulary filter: 2418
-  films with no collection after the vocabulary filter: 7840
+  keywords    columns  131-258  (128)  code
+  cast        columns  259-386  (128)  code
+  directors   columns  387-514  (128)  code
+  writers     columns  515-642  (128)  code
+  companies   columns  643-770  (128)  code
+  collection  columns  771-898  (128)  code
+  numeric     columns  899-901  (3)
+  genres      films with an empty list: 35; with no value left after the vocabulary filter: 35
+  keywords    films with an empty list: 755
+  cast        films with an empty list: 90
+  directors   films with an empty list: 24
+  writers     films with an empty list: 494
+  companies   films with an empty list: 660
+  collection  films with an empty list: 7355
   films with no overview/tagline: 13
+  missing budgets (4409 films) filled by a ridge regression on year, runtime, genres, language, companies; R^2 on held-out films with a known budget: 0.50
   missing year / runtime / budget: 0 / 20 / 4409

@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "slices": {
     "text": [
       0,
@@ -14,74 +15,82 @@
     ],
     "keywords": [
       131,
-      181
+      259
     ],
     "cast": [
-      181,
-      231
+      259,
+      387
     ],
     "directors": [
-      231,
-      261
+      387,
+      515
     ],
     "writers": [
-      261,
-      291
+      515,
+      643
     ],
     "companies": [
-      291,
-      321
+      643,
+      771
     ],
     "collection": [
-      321,
-      729
+      771,
+      899
     ],
     "numeric": [
-      729,
-      733
+      899,
+      902
     ]
   },
   "weights": {
-    "text": 1.0,
-    "genres": 1.0,
-    "language": 0.5,
+    "text": 0.5,
+    "genres": 1.5,
+    "language": 0.25,
     "keywords": 1.0,
     "cast": 1.0,
     "directors": 1.0,
     "writers": 1.0,
     "companies": 1.0,
     "collection": 1.0,
-    "numeric": 1.0
+    "numeric": 1.5
   },
-  "settings": {
+  "encoding": {
     "keywords": [
-      5,
-      50
+      "code",
+      2,
+      128
     ],
     "cast": [
-      5,
-      50
+      "code",
+      2,
+      128
     ],
     "directors": [
-      3,
-      30
+      "code",
+      2,
+      128
     ],
     "writers": [
-      3,
-      30
+      "code",
+      2,
+      128
     ],
     "companies": [
-      5,
-      30
+      "code",
+      2,
+      128
     ],
     "collection": [
+      "code",
       2,
-      null
-    ],
-    "text": [
-      5,
-      100
+      128
     ]
   },
+  "budget": "regression",
+  "text_settings": [
+    5,
+    100
+  ],
+  "code_dim": 128,
   "seed": 2026
 }
