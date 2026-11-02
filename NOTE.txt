@@ -1,0 +1,18 @@
+PCA, SVD e NMF: blocchi A/B/C/D, stesso k e stesso train/heldout condiviso.
+Preprocessing NON rifatto: i risultati non replicano lo split interno di Tassan.
+PCA centrata; SVD non centrata; nessuna nuova standardizzazione delle colonne.
+NMF applicata a [max(X,0), max(-X,0)]: trasformazione reversibile che cambia geometria
+ed obiettivo di ricostruzione. I codici casuali non diventano fattori semantici positivi.
+NMF ha un solo avvio NNDSVDa: risultato esplorativo, non ricerca globale ottimale.
+Ricostruzione valutata nelle colonne originali (per NMF sottraendo le due parti).
+Percentuale ricostruzione = 100*(1-SSE/sum((X_subset-media_train)^2)).
+Puo' essere negativa; NON e' la somma di varianze di componenti NMF.
+Confrontare metodi ENTRO un blocco: A e D hanno target/denominatori diversi.
+Per scegliere blocchi o k aggiungere validation; non ottimizzare ripetutamente sul heldout.
+Le 12 mappe sono PCA 2D di embedding kD, NON NMF diretta a due componenti;
+la proiezione delle mappe e' addestrata sul training. Assi e scale non allineati tra mappe.
+Gli embedding NMF sono W*norma_riga(H) per fissare l'ambiguita' di scala dei fattori.
+Convergenza=False segnala un warning in fit o transform: aumentare max_iter e ricontrollare.
+I .joblib contengono modelli, colonne originali (indici Python), proiezione della mappa;
+per nuovi dati NMF usare lo stesso split +/- e embedding_scale dopo transform.
+Gli embedding CSV sono compatibili con il formato dell'evaluatore condiviso di Sergio.
