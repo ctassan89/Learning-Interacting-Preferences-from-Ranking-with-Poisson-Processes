@@ -1,0 +1,4 @@
+# Extra dependencies of the text-embedding experiments (experiments/TextEmbeddings).
+# Install together with the shared ones (umap-learn is already in the root file):
+#   pip install -r requirements.txt -r experiments/TextEmbeddings/requirements.txt
+sentence-transformers>=3.0
