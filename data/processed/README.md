@@ -62,7 +62,7 @@ the time-matched taste test, confirmed on the other half.
 
 ## How we checked it
 With an ablation study (each block alone, the matrix without each block, both encodings) and the weight
-search; the analysis scripts will be added with the report. Taste AUC on the full matrix (0.5 = no
+search: `scripts/ablation_features.py` and `scripts/tune_weights.py`. Taste AUC on the full matrix (0.5 = no
 signal), version 1 -> version 2:
 
 | taste test | v1 | v2 |
