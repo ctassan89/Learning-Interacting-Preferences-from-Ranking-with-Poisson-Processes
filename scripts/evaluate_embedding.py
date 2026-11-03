@@ -12,16 +12,28 @@ EMBEDDING FILE FORMAT
 USAGE
     python3 scripts/evaluate_embedding.py --embedding results/embeddings/pca_2d.npz --name pca_2d
     python3 scripts/evaluate_embedding.py --embedding ... --name ... --umap      # also UMAP 2D and 3D
+                                                    (UMAP_SETTINGS: n_neighbors 15, min_dist 0, fitted on train)
     From a notebook:  from evaluate_embedding import evaluate;  evaluate(Z, movie_ids, "pca_2d")
 
 WHAT IT MEASURES (on each "space": the embedding as given, plus UMAP 2D/3D if requested)
-  1. Cluster separation  - KMeans with k clusters fitted on TRAIN movies:
-                           silhouette (higher = better), Davies-Bouldin (lower = better),
-                           Calinski-Harabasz (higher = better).
-  2. Meaning             - genre purity of the KMeans clusters (first listed genre);
-                           kNN genre agreement: mean Jaccard between the genres of a movie and of its
-                           10 nearest neighbours, compared with random pairs.
-  3. Taste tests         - movies in the same user's top-10 list should be closer than other pairs.
+The embedding's job is to put SIMILAR MOVIES close; "similar" is defined by the shared feature matrix
+(data/processed/features.npz, its blocks and weights). The ratings are used only in section 4, as a check.
+  1. Similarity (main)   - knn_kept: share of each movie's 10 nearest neighbours in the feature matrix that are
+                           still among its 10 nearest in the embedding (random embedding: 0.001; _heldout = for
+                           held-out movies only); trustworthiness: are the neighbours shown by the embedding
+                           really close in the feature matrix (1 = always; on a sample of 2,500 movies);
+                           genre_knn: mean Jaccard between the genres of a movie and of its 10 nearest
+                           neighbours (genre_random_pairs = the same for random pairs);
+                           saga_at10 / director_at10: share of movies with another movie of the same saga /
+                           director among their 10 nearest (only movies whose saga / director has 2+ movies).
+  2. Cluster separation  - KMeans with k clusters fitted on TRAIN movies: silhouette (higher = better,
+                           0 = no clusters), Davies-Bouldin (lower = better), Calinski-Harabasz (higher =
+                           better), genre purity (share of the cluster's most common first genre);
+                           HDBSCAN (min 40 movies, only for spaces of <= 50 dimensions): number of dense
+                           clusters and share of train movies left between clusters (hdbscan_noise).
+  3. New movies          - the _heldout metrics: neighbours searched among train movies, clusters from train;
+                           they should not be much worse than for train movies.
+  4. Taste (check)       - movies in the same user's top-10 list should be closer than other pairs.
                            AUC = P(other pair farther than same-list pair): 0.5 = no signal, 1 = perfect,
                            with a 95% bootstrap interval over users (_lo, _hi). Three kinds of "other pairs":
                            taste_auc       random pairs drawn from all users' lists (same popularity);
@@ -29,9 +41,8 @@ WHAT IT MEASURES (on each "space": the embedding as given, plus UMAP 2D/3D if re
                                            about the same time (a user active in 1997 cannot have 2010
                                            films in the list: this removes that advantage of the year);
                            taste_auc_user  a top-10 movie and a movie the SAME user disliked (rating <= 2.5).
-                           Ratings are used ONLY here, to evaluate, never to build the embedding.
-  4. New movies          - the same metrics for HELD-OUT movies (neighbours searched among train movies,
-                           clusters from train): they should not be much worse than for train movies.
+                           A check that "similar movies" relates to tastes, not a target to optimise: the
+                           ratings are used again by the Plackett-Luce model.
   5. Look                - nearest neighbours of a few known movies, and a 2D map coloured by genre.
 
 OUTPUT (folder results/ by default)
@@ -45,7 +56,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
+from sklearn.cluster import HDBSCAN, KMeans
+from sklearn.manifold import trustworthiness
 from sklearn.metrics import (calinski_harabasz_score, davies_bouldin_score,
                              silhouette_score)
 from sklearn.neighbors import NearestNeighbors
@@ -57,12 +69,20 @@ TOP_M = 10                     # length of the users' top lists for the taste te
 LOW_RATING = 2.5               # "disliked" = rating <= 2.5 (within-user taste test)
 TIME_GROUP = 20                # users per time group (time-matched taste test)
 N_BOOT = 1000                  # bootstrap resamples of the users
+N_TRUST = 2500                 # movies sampled for trustworthiness
+HDBSCAN_MIN = 40               # smallest HDBSCAN cluster
+HDBSCAN_MAX_DIM = 50           # HDBSCAN only on spaces with at most this many dimensions
+# UMAP used by --umap: min_dist 0 separates the clusters most at no cost in similarity (sweep of 3 Nov 2026
+# on the feature matrix: silhouette 0.53 vs 0.47 with the default 0.1, same neighbours kept)
+UMAP_SETTINGS = {"n_neighbors": 15, "min_dist": 0.0}
 REFERENCE_TITLES = ["Toy Story", "The Godfather", "Pulp Fiction", "The Matrix",
                     "Titanic", "The Shining", "Finding Nemo", "Casablanca"]
 
 REPO = Path(__file__).resolve().parent.parent
 DEFAULTS = {"catalogue": REPO / "data" / "processed" / "catalogue.csv",
             "ratings": REPO / "data" / "raw" / "ratings_small.csv",
+            "features": REPO / "data" / "processed" / "features.npz",
+            "movies": REPO / "data" / "processed" / "movies_clean.csv",
             "out": REPO / "results"}
 
 
@@ -148,6 +168,45 @@ def cluster_metrics(Z, train, heldout, first_genre, k):
     if len(np.unique(lab_ho)) > 1:
         out[f"k{k}_silhouette_heldout"] = silhouette_score(Z[heldout], lab_ho)
     return out
+
+
+def hdbscan_metrics(Z, train):
+    if Z.shape[1] > HDBSCAN_MAX_DIM:
+        return {}
+    lab = HDBSCAN(min_cluster_size=HDBSCAN_MIN, copy=True).fit_predict(Z[train])
+    return {"hdbscan_clusters": int(lab.max() + 1), "hdbscan_noise": float(np.mean(lab < 0))}
+
+
+class Reference:
+    """What "similar" means: neighbours in the shared feature matrix, and shared sagas / directors."""
+
+    def __init__(self, catalogue, features_path, movies_path):
+        z = np.load(features_path)
+        self.X = align(np.asarray(z["X"], dtype=float), np.asarray(z["movieId"]), catalogue)
+        nb = NearestNeighbors(n_neighbors=N_NEIGHBORS + 1).fit(self.X).kneighbors(self.X, return_distance=False)
+        self.neighbours = [set(r[1:]) for r in nb]
+        movies = pd.read_csv(movies_path).set_index("movieId").loc[catalogue.movieId].reset_index()
+        self.names = {col: [set(n for n in s.split("|") if n) for s in movies[col].fillna("")]
+                      for col in ("collection", "directors")}
+        self.sample = np.random.default_rng(SEED).choice(len(self.X), min(N_TRUST, len(self.X)), replace=False)
+
+
+def same_name_at_k(nb, sets):
+    counts = {}
+    for s in sets:
+        for n in s:
+            counts[n] = counts.get(n, 0) + 1
+    films = [i for i, s in enumerate(sets) if any(counts[n] > 1 for n in s)]
+    return float(np.mean([any(sets[i] & sets[j] for j in nb[i][1:]) for i in films]))
+
+
+def similarity_metrics(Z, ref, heldout):
+    nb = NearestNeighbors(n_neighbors=N_NEIGHBORS + 1).fit(Z).kneighbors(Z, return_distance=False)
+    kept = np.array([len(ref.neighbours[i] & set(r[1:])) / N_NEIGHBORS for i, r in enumerate(nb)])
+    return {"knn_kept": float(kept.mean()), "knn_kept_heldout": float(kept[heldout].mean()),
+            "trustworthiness": float(trustworthiness(ref.X[ref.sample], Z[ref.sample], n_neighbors=N_NEIGHBORS)),
+            "saga_at10": same_name_at_k(nb, ref.names["collection"]),
+            "director_at10": same_name_at_k(nb, ref.names["directors"])}
 
 
 def purity(labels, classes):
@@ -320,7 +379,8 @@ def plot_map(Z2, catalogue, path, title):
 
 # ----------------------------------------------------------------------------- main entry
 def evaluate(Z, movie_ids, name, catalogue_path=DEFAULTS["catalogue"], ratings_path=DEFAULTS["ratings"],
-             out_dir=DEFAULTS["out"], use_umap=False):
+             out_dir=DEFAULTS["out"], use_umap=False, features_path=DEFAULTS["features"],
+             movies_path=DEFAULTS["movies"]):
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
     catalogue = pd.read_csv(catalogue_path)
     ratings = pd.read_csv(ratings_path)
@@ -330,6 +390,7 @@ def evaluate(Z, movie_ids, name, catalogue_path=DEFAULTS["catalogue"], ratings_p
     genres = genre_sets(catalogue)
     first_genre = catalogue.genres.fillna("").str.split("|").str[0].replace("", "none").to_numpy()
     tests = taste_tests(user_lists(ratings, catalogue), heldout)
+    ref = Reference(catalogue, features_path, movies_path)
 
     spaces = {"native": Z}
     if use_umap:
@@ -338,16 +399,18 @@ def evaluate(Z, movie_ids, name, catalogue_path=DEFAULTS["catalogue"], ratings_p
         except ImportError:
             sys.exit("--umap needs the umap-learn package:  pip install umap-learn")
         for c in (2, 3):
-            red = umap.UMAP(n_components=c, random_state=SEED).fit(Z[train])
+            red = umap.UMAP(n_components=c, random_state=SEED, **UMAP_SETTINGS).fit(Z[train])
             spaces[f"umap{c}d"] = red.transform(Z)
 
     rows = []
     for space, S in spaces.items():
         rng = np.random.default_rng(SEED)
         row = {"method": name, "space": space, "dim": S.shape[1]}
+        row.update(similarity_metrics(S, ref, heldout))
+        row.update(genre_agreement(S, train, heldout, genres, rng))
         for k in K_CLUSTERS:
             row.update(cluster_metrics(S, train, heldout, first_genre, k))
-        row.update(genre_agreement(S, train, heldout, genres, rng))
+        row.update(hdbscan_metrics(S, train))
         row.update(taste_metrics(S, tests))
         rows.append(row)
         if S.shape[1] == 2:
@@ -376,6 +439,8 @@ if __name__ == "__main__":
     p.add_argument("--catalogue", default=DEFAULTS["catalogue"])
     p.add_argument("--ratings", default=DEFAULTS["ratings"])
     p.add_argument("--out", default=DEFAULTS["out"])
+    p.add_argument("--features", default=DEFAULTS["features"], help="feature matrix that defines similarity")
+    p.add_argument("--movies", default=DEFAULTS["movies"], help="movies_clean.csv, for sagas and directors")
     a = p.parse_args()
     Z, ids = load_embedding(a.embedding)
-    evaluate(Z, ids, a.name, a.catalogue, a.ratings, a.out, a.umap)
+    evaluate(Z, ids, a.name, a.catalogue, a.ratings, a.out, a.umap, a.features, a.movies)

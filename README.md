@@ -5,7 +5,8 @@
 - `data/processed/`: shared catalogue, feature matrix and preference lists (see its README).
 - `preference_dataset/`: notebook that builds the users' top-10 preference lists.
 - `scripts/build_features.py`: builds `data/processed/` from `data/raw/`.
-- `scripts/evaluate_embedding.py`: shared evaluation of any movie embedding (clusters, genres, taste tests).
+- `scripts/evaluate_embedding.py`: shared evaluation of any movie embedding (similarity kept, clusters, taste check).
+- `scripts/embed_umap.py`: UMAP 3D / 2D embedding of the movies with the chosen settings, and its clusters.
 - `results/`: outputs of the scripts; not committed.
 
 ## Setup (Python 3.13)
