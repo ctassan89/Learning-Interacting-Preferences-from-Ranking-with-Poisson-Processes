@@ -1,0 +1,13 @@
+{
+  "fit_split": "train",
+  "n_components": 3,
+  "explained_variance_ratio": {
+    "PC1": 0.9402636289596558,
+    "PC2": 0.0289070475846529,
+    "PC3": 0.02385084144771099
+  },
+  "cumulative_explained_variance": {
+    "PC1_PC2": 0.9691706765443087,
+    "PC1_PC3": 0.9930215179920197
+  }
+}

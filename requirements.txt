@@ -5,6 +5,7 @@ scipy==1.18.1
 scikit-learn==1.9.1
 joblib==1.6.0
 matplotlib==3.11.2
+plotly>=5.0
 umap-learn==0.5.12
 
 # Autoencoder and variational autoencoder experiments
