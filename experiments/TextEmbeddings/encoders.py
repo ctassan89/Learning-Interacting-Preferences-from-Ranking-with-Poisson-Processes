@@ -35,9 +35,6 @@ PRETRAINED_MODELS = {
     # "query: " is the prefix e5 recommends for symmetric similarity tasks
     "e5": PretrainedSpec("intfloat/e5-base-v2", prefix="query: "),
     "bge": PretrainedSpec("BAAI/bge-base-en-v1.5"),
-    # optional larger variants
-    "e5_large": PretrainedSpec("intfloat/e5-large-v2", prefix="query: "),
-    "bge_large": PretrainedSpec("BAAI/bge-large-en-v1.5"),
 }
 
 

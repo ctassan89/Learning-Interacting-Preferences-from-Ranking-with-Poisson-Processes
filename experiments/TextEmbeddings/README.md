@@ -62,8 +62,6 @@ Design choices:
 | `bge` | `BAAI/bge-base-en-v1.5` | 768 | no (pretrained) |
 | `lsa` | TF-IDF (1–2-grams, English stop words, sublinear tf) + truncated SVD | 100–300 | **yes, train only** |
 
-Optional, not in the main grid: `e5_large`, `bge_large`.
-
 - **Pretrained models** (Sentence-BERT family, e5, bge) are used as they are: nothing is
   learned from our movies, so there is no possible leakage.
 - **LSA** is the classical baseline. The TF-IDF vocabulary, IDF weights and SVD are fitted
