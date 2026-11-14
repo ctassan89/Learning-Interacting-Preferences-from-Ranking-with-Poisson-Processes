@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from experiments.postprocess import (
+from experiments.dimensionality_reduction.postprocess import (
     REQUIRED_ARTIFACTS,
     _score_cluster,
     discover_experiments,

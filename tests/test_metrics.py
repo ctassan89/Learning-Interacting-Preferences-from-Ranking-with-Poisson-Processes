@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 
-from experiments.common import (
+from experiments.dimensionality_reduction.common import (
     DATASET_VERSION,
     FEATURE_CONFIGURATIONS,
     FEATURE_GROUPS,
@@ -289,7 +289,7 @@ class MetricsTests(unittest.TestCase):
             slices[name] = (start, start + width)
             start += width
         matrix = np.zeros((3, start), dtype=np.float32)
-        from experiments.common import select_feature_groups
+        from experiments.dimensionality_reduction.common import select_feature_groups
 
         for name, groups in FEATURE_CONFIGURATIONS.items():
             selected = select_feature_groups(matrix, slices, groups)

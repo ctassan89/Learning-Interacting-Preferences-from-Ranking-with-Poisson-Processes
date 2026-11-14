@@ -26,8 +26,8 @@ from metrics.metrics import (
     silhouette_score,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RESULTS_ROOT = PROJECT_ROOT / "results"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+RESULTS_ROOT = PROJECT_ROOT / "results" / "dimensionality_reduction"
 REQUIRED_ARTIFACTS = {
     "model.pt",
     "config.json",

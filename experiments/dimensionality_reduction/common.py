@@ -88,9 +88,9 @@ FEATURE_CONFIGURATIONS = {
 }
 FEATURE_GROUPS = FEATURE_CONFIGURATIONS["A"]
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
-RESULTS_DIR = PROJECT_ROOT / "results" / "AE_A"
+RESULTS_DIR = PROJECT_ROOT / "results" / "dimensionality_reduction" / "AE_A"
 DATASET_VERSION = "v2"
 LIST_COLUMNS = (
     "genres",
@@ -511,7 +511,7 @@ def run_ae(experiment: str, feature_groups: tuple[str, ...]) -> None:
         device=device,
         experiment_name=experiment,
         feature_groups=feature_groups,
-        results_dir=PROJECT_ROOT / "results" / experiment,
+        results_dir=PROJECT_ROOT / "results" / "dimensionality_reduction" / experiment,
     )
 
 
@@ -626,7 +626,7 @@ def run_vae(experiment: str, feature_groups: tuple[str, ...]) -> None:
     history, best_epoch, best_loss = train_vae(
         model, prepared.features["train"], prepared.features["val"], device=device
     )
-    results_dir = PROJECT_ROOT / "results" / experiment
+    results_dir = PROJECT_ROOT / "results" / "dimensionality_reduction" / experiment
     results_dir.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
@@ -715,7 +715,13 @@ def normalize_beta(beta: float) -> str:
 
 def beta_results_dir(experiment: str, beta: float) -> Path:
     """Return the isolated, canonical output directory for one beta value."""
-    return PROJECT_ROOT / "results" / experiment / f"beta_{normalize_beta(beta)}"
+    return (
+        PROJECT_ROOT
+        / "results"
+        / "dimensionality_reduction"
+        / experiment
+        / f"beta_{normalize_beta(beta)}"
+    )
 
 
 def ensure_empty_results_dir(results_dir: Path) -> None:
