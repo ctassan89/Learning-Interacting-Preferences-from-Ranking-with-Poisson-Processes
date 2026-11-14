@@ -9,7 +9,7 @@ from unittest.mock import patch
 import numpy as np
 from sklearn.decomposition import PCA
 
-from experiments.visualize_pca import (
+from experiments.dimensionality_reduction.visualize_pca import (
     EmbeddingRun,
     _arguments,
     discover_experiments,
@@ -116,10 +116,10 @@ class VisualizePcaTests(unittest.TestCase):
             self.assertEqual(discover_experiments(root), [run_path])
             run = load_experiment(run_path)
             with patch(
-                "experiments.visualize_pca.save_2d_plot",
+                "experiments.dimensionality_reduction.visualize_pca.save_2d_plot",
                 side_effect=lambda *args: args[-1].write_bytes(b"png"),
             ) as plot_2d, patch(
-                "experiments.visualize_pca.save_3d_plot",
+                "experiments.dimensionality_reduction.visualize_pca.save_3d_plot",
                 side_effect=lambda *args: args[-1].write_text("html"),
             ) as plot_3d:
                 output = write_visualization(
@@ -151,7 +151,7 @@ class VisualizePcaTests(unittest.TestCase):
             [
                 "visualize_pca",
                 "--experiment",
-                "results/AE_A",
+                "results/dimensionality_reduction/AE_A",
                 "--splits",
                 "train",
                 "val",
@@ -159,7 +159,7 @@ class VisualizePcaTests(unittest.TestCase):
             ],
         ):
             args = _arguments()
-        self.assertEqual(args.experiment, Path("results/AE_A"))
+        self.assertEqual(args.experiment, Path("results/dimensionality_reduction/AE_A"))
         self.assertEqual(args.splits, ["train", "val"])
         self.assertTrue(args.dry_run)
 

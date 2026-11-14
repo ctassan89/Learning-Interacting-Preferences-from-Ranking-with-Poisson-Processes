@@ -61,7 +61,8 @@ runs/
 wandb/
 mlruns/
 outputs/
-results/
+/results/dimensionality_reduction/
+/results/gibbs_sampler/
 
 # Local experiment plots
 *_training_validation.png

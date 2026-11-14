@@ -15,8 +15,8 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RESULTS_ROOT = PROJECT_ROOT / "results"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+RESULTS_ROOT = PROJECT_ROOT / "results" / "dimensionality_reduction"
 MOVIES_CLEAN_PATH = PROJECT_ROOT / "data" / "processed" / "movies_clean.csv"
 SPLITS = ("train", "val", "heldout")
 OUTPUT_FILES = ("pca_2d.png", "pca_3d.html", "explained_variance.json")

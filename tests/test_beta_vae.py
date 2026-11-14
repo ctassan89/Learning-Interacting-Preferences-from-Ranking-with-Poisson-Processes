@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 
 import torch
 
-from experiments.common import (
+from experiments.dimensionality_reduction.common import (
     _beta_vae_batch_losses,
     beta_results_dir,
     ensure_empty_results_dir,
