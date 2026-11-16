@@ -19,7 +19,7 @@ import numpy as np
 M = 10
 m = 3
 L = 1000
-alpha_prior = 2.0
+alpha_prior = 1.0
 tau_prior = 1.0  # Gamma rate, NOT scale
 
 n_chains = 4
@@ -289,3 +289,4 @@ plt.close(fig)
 print("\nResults saved in:", output_dir)
 for file in sorted(output_dir.iterdir()):
     print("  -", file.name)
+
